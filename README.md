@@ -61,7 +61,7 @@ Add this configuration to your MCP client (e.g., Claude Desktop, Cursor):
   "mcpServers": {
     "drawio": {
       "command": "node",
-      "args": ["/path/to/drawio-mcp-server/dist/index.js"]
+      "args": ["/path/to/drawio-mcp/dist/index.js"]
     }
   }
 }

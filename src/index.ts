@@ -10,7 +10,7 @@ import { EditNodeTool } from './mcp/EditNodeTool';
 import { RemoveNodesTool } from './mcp/RemoveNodesTool';
 
 new McpServer({
-  name: 'drawio-mcp-server',
+  name: 'drawio-mcp',
   version: '1.0.0',
   tools: [
     new NewDiagramTool(),

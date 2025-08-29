@@ -1,11 +1,11 @@
 {
-  "name": "drawio-mcp-server",
+  "name": "drawio-mcp",
   "version": "1.0.0",
   "description": "MCP server for generating draw.io diagrams using mxgraph. Create and manage diagrams programmatically with VSCode compatibility.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "drawio-mcp-server": "dist/index.js"
+    "drawio-mcp": "dist/index.js"
   },
   "files": [
     "dist/**/*",
