@@ -16,6 +16,10 @@ This server enables you to build diagrams incrementally by providing stateless t
 - **MCP Integration**: Works with Claude Desktop and other MCP-compatible applications
 - **TypeScript**: Full type safety and IntelliSense support
 
+## Demo
+
+[![Video Presentation](presentation.mov)](presentation.mov)
+
 ## Installation
 
 ### Prerequisites
