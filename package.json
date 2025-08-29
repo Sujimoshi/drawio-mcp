@@ -13,12 +13,7 @@
   ],
   "scripts": {
     "start": "tsx src/index.ts",
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "tsc --noEmit",
-    "prepare": "npm run build"
+    "build": "tsc"
   },
   "keywords": [
     "mcp",
