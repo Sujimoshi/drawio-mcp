@@ -3,6 +3,7 @@
   "version": "0.0.0-auto",
   "description": "MCP server for generating draw.io diagrams using mxgraph. Create and manage diagrams programmatically with VSCode compatibility.",
   "main": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "bin": {
     "drawio-mcp": "dist/index.js"

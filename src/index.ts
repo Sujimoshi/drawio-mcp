@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import { LinkNodesTool } from './mcp/LinkNodesTools';
-import { GetDiagramInfoTool } from './mcp/GetDiagramInfoTool';
-import { McpServer } from './mcp/McpServer';
-import { NewDiagramTool } from './mcp/NewDiagramTool';
-import { AddNodeTool } from './mcp/AddNodeTool';
-import { Logger } from './Logger';
-import { EditNodeTool } from './mcp/EditNodeTool';
-import { RemoveNodesTool } from './mcp/RemoveNodesTool';
+import { LinkNodesTool } from './mcp/LinkNodesTools.js';
+import { GetDiagramInfoTool } from './mcp/GetDiagramInfoTool.js';
+import { McpServer } from './mcp/McpServer.js';
+import { NewDiagramTool } from './mcp/NewDiagramTool.js';
+import { AddNodeTool } from './mcp/AddNodeTool.js';
+import { Logger } from './Logger.js';
+import { EditNodeTool } from './mcp/EditNodeTool.js';
+import { RemoveNodesTool } from './mcp/RemoveNodesTool.js';
 
 new McpServer({
   name: 'drawio-mcp',

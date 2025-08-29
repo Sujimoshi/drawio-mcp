@@ -1,5 +1,4 @@
-import { ErrorCode } from '@modelcontextprotocol/sdk/types';
-import { mxGraph, mxCodec, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxGeometry } from './mxgraph';
+import { mxGraph, mxCodec, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxGeometry } from './mxgraph/index.js';
 
 export class Graph {
   static Kinds = {

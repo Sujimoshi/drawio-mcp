@@ -1,15 +1,15 @@
 // @ts-check
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
   ErrorCode,
   ListToolsRequestSchema,
   McpError,
-} from '@modelcontextprotocol/sdk/types.js';
-import { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
-import { Logger } from '../Logger';
+} from "@modelcontextprotocol/sdk/types.js";
+import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
+import { Logger } from '../Logger.js';
 
 export interface Tool {
   schema: () => { name: string; description: string; inputSchema: object };

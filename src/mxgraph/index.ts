@@ -1,4 +1,4 @@
-import './jsdom';
+import './jsdom.js';
 import mxgraph from 'mxgraph';
 
 export const { mxGraph, mxGraphModel, mxGeometry, mxCodec, mxPoint, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxSwimlaneLayout } = mxgraph({

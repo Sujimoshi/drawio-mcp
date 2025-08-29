@@ -1,6 +1,6 @@
-import { GraphFileManager } from "../GraphFileManager";
-import { ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
-import { Tool } from "./McpServer";
+import { GraphFileManager } from "../GraphFileManager.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import { Tool } from "./McpServer.js";
 
 export class GetDiagramInfoTool implements Tool {
   constructor(private fileManager = GraphFileManager.default) {}

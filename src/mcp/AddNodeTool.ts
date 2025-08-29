@@ -1,7 +1,7 @@
-import { GraphFileManager } from "../GraphFileManager";
-import { ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
-import { Tool } from "./McpServer";
-import { Graph } from "../Graph";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import { GraphFileManager } from "../GraphFileManager.js";
+import { Tool } from "./McpServer.js";
+import { Graph } from "../Graph.js";
 
 export class AddNodeTool implements Tool {
   constructor(private fileManager = GraphFileManager.default) {}

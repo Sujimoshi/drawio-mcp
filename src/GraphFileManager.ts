@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import pako from 'pako';
-import { Graph } from './Graph';
+import { Graph } from './Graph.js';
 
 /**
  * Handles diagram file operations and SVG content parsing
