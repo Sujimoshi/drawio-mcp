@@ -28,33 +28,6 @@ This server enables you to build diagrams incrementally by providing stateless t
 - Node.js 18.0.0 or higher
 - npm or yarn
 
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/Sujimoshi/drawio-mcp.git
-cd drawio-mcp
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-```
-
-### Development
-
-```bash
-# Start in development mode
-npm start
-
-# Build for production
-npm run build
-
-# Clean build artifacts
-npm run clean
-```
-
 ## Configuration
 
 ### MCP Client Setup
@@ -64,9 +37,9 @@ Add this configuration to your MCP client (e.g., Claude Desktop, Cursor):
 ```json
 {
   "mcpServers": {
-    "drawio": {
-      "command": "node",
-      "args": ["/path/to/drawio-mcp/dist/index.js"]
+    "drawio-diagrams": {
+      "command": "npx",
+      "args": ["drawio-mcp"]
     }
   }
 }
