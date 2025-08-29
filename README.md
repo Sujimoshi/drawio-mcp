@@ -18,7 +18,7 @@ This server enables you to build diagrams incrementally by providing stateless t
 
 ## Demo
 
-[![Video Presentation](presentation.mov)](presentation.mov)
+![Demo](presentation.gif)
 
 ## Installation
 
