@@ -1,0 +1,84 @@
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Development files
+tsconfig.json
+.github/
+.vscode/
+.idea/
+
+# Tests
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Linting and formatting
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.travis.yml
+.circleci/
+.gitlab-ci.yml
+azure-pipelines.yml
+appveyor.yml
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+
+# Environment variables
+.env*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# Build artifacts (keep dist for publishing)
+# dist/ is NOT ignored because we need it for publishing
+
+# Package files
+*.tgz
+*.tar.gz
