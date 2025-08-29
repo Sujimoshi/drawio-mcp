@@ -20,7 +20,6 @@ jobs:
         run: npm ci
 
       - name: Build package
-        if: steps.release.outputs.version != ''
         run: npm run build
 
       - name: Semantic Release
@@ -47,7 +46,9 @@ jobs:
 
       - name: Publish to npm
         if: steps.release.outputs.version != ''
-        run: npm publish drawio-mcp@${{ steps.release.outputs.version }} --access public
+        run: |
+          npm version ${{ steps.release.outputs.version }} --no-git-tag-version --allow-same-version
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
