@@ -8,7 +8,7 @@ export class LinkNodesTool implements Tool {
   schema() {
     return {
       name: 'link_nodes',
-      description: 'Create a connection between two nodes in a diagram file',
+      description: 'Create one or more connections between nodes in a diagram file',
       inputSchema: {
         type: 'object',
         properties: {
@@ -16,35 +16,44 @@ export class LinkNodesTool implements Tool {
             type: 'string',
             description: 'Absolute or relative path to the diagram file to modify'
           },
-          from: { type: 'string', description: 'Source node ID' },
-          to: { type: 'string', description: 'Target node ID' },
-          title: { type: 'string', description: 'Connection label (optional)' },
-          dashed: { type: 'boolean', description: 'Whether the connection should be dashed' },
-          reverse: { type: 'boolean', description: 'Whether to reverse the connection direction' }
+          edges: {
+            type: 'array',
+            description: 'Array of edges to create',
+            items: {
+              type: 'object',
+              properties: {
+                from: { type: 'string', description: 'Source node ID' },
+                to: { type: 'string', description: 'Target node ID' },
+                title: { type: 'string', description: 'Connection label (optional)' },
+                dashed: { type: 'boolean', description: 'Whether the connection should be dashed' },
+                reverse: { type: 'boolean', description: 'Whether to reverse the connection direction' }
+              },
+              required: ['from', 'to']
+            }
+          }
         },
-        required: ['file_path', 'from', 'to']
+        required: ['file_path', 'edges']
       }
     }
   }
 
-  async execute({ file_path, from, to, title, dashed, reverse }) {
-    if (!file_path || !from || !to) {
+  async execute({ file_path, edges }) {
+    if (!file_path || !edges || !edges.length) {
       throw new McpError(ErrorCode.InvalidParams, 'file_path, from, and to are required');
     }
 
     const graph = await this.fileManager.loadGraphFromSvg(file_path);
 
-    const style = {
-      ...(dashed && { dashed: 1 }),
-      ...(reverse && { reverse: true }),
-    };
+    for (const edge of edges) {
+      const { from, to, title, dashed, reverse } = edge;
 
-    const id = graph.linkNodes({
-      from,
-      to,
-      ...(title && { title }),
-      ...(Object.keys(style).length > 0 && { style })
-    });
+      const style = {
+        ...(dashed && { dashed: 1 }),
+        ...(reverse && { reverse: true }),
+      };
+      
+      graph.linkNodes({ from, to, title, style });
+    }
 
     await this.fileManager.saveGraphToSvg(graph, file_path);
     
@@ -52,7 +61,7 @@ export class LinkNodesTool implements Tool {
       content: [
         {
           type: 'text',
-          text: `Linked nodes: ${from} -> ${to} with id [${id}] ${title ? ` (${title})` : ''} in ${file_path}`,
+          text: `Linked nodes in ${file_path}`,
         }
       ]
     };
