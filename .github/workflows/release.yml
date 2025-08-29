@@ -47,7 +47,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.release.outputs.version != ''
-        run: npm publish
+        run: npm publish --version ${{ steps.release.outputs.version }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
