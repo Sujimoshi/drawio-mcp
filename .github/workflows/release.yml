@@ -1,0 +1,42 @@
+name: Release
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Semantic Release
+        uses: Sujimoshi/semantic-release-action@v1.8.0
+        id: release
+        with:
+          branches: |
+            +([0-9])?(.{+([0-9]),x}).x
+            main
+            next
+            next-major
+            { "name": "alpha", "prerelease": true }
+            { "name": "beta", "prerelease": true }
+
+      - name: Get the output
+        run: |
+          echo "Version: ${{ steps.release.outputs.version }}"
+          echo "Tag: ${{ steps.release.outputs.tag }}"
+          echo "Name: ${{ steps.release.outputs.name }}"
+          echo "Notes: ${{ steps.release.outputs.notes }}"
+          echo "Type: ${{ steps.release.outputs.type }}"
+          echo "Channel: ${{ steps.release.outputs.channel }}"
+
+      - name: Publish Github Release
+        uses: actions/create-release@v1.18.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          release_name: ${{ steps.release.outputs.name }}
+          body: ${{ steps.release.outputs.notes }}
+          draft: false
+          prerelease: ${{ !!steps.release.outputs.channel }}
