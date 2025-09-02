@@ -9,13 +9,22 @@ export class AddNodeTool implements Tool {
   schema() {
     return {
       name: 'add_nodes',
-      description: 'Add one or more nodes to a diagram file',
+      description: 'Add one or more nodes to a diagram file. Optionally run an automatic layout after insertion.',
       inputSchema: {
         type: 'object',
         properties: {
           file_path: {
             type: 'string',
             description: 'Absolute or relative path to the diagram file to modify'
+          },
+          layout: {
+            type: 'object',
+            description: 'Optional automatic layout configuration',
+            properties: {
+              algorithm: { type: 'string', enum: ['hierarchical','circle','organic','compact-tree','radial-tree','partition','stack'], description: 'Layout algorithm' },
+              options: { type: 'object', description: 'Algorithm-specific options (e.g., { direction: "top-down" | "left-right" } for hierarchical)' }
+            },
+            required: ['algorithm']
           },
           nodes: {
             type: 'array',
@@ -50,7 +59,7 @@ export class AddNodeTool implements Tool {
     }
   }
 
-  async execute({ file_path, nodes }) {
+  async execute({ file_path, nodes, layout }) {
     if (!file_path || !nodes || !nodes.length) {
       throw new McpError(ErrorCode.InvalidParams, 'file_path and nodes are required');
     }
@@ -63,13 +72,25 @@ export class AddNodeTool implements Tool {
       graph.addNode({ 
         id, 
         title, 
-        kind, 
+        kind: Graph.normalizeKind(kind), 
         parent, 
         x: Number(x), 
         y: Number(y),
         ...(width && { width: Number(width) }),
         ...(height && { height: Number(height) })
       });
+    }
+
+    // TODO: Prefer a separate `layout_diagram` tool to decouple layout from add operations for better edge-aware reflow.
+    if (layout) {
+      if (!layout.algorithm) {
+        throw new McpError(ErrorCode.InvalidParams, 'layout.algorithm is required when layout is provided');
+      }
+      try {
+        graph.applyLayout(layout);
+      } catch (e: any) {
+        throw new McpError(ErrorCode.InvalidParams, e?.message || 'Invalid layout configuration');
+      }
     }
 
     await this.fileManager.saveGraphToSvg(graph, file_path);

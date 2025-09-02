@@ -85,10 +85,14 @@ Create a new empty diagram file.
 
 ### add_nodes
 
-Add one or more nodes to an existing diagram in a single operation.
+Add one or more nodes to an existing diagram in a single operation. Optionally run an automatic layout after insertion.
 
 **Parameters:**
 - `file_path` (string, required): Path to the diagram file
+- `layout` (object, optional): Automatic layout configuration
+  - `algorithm` (string, required if `layout` is provided): One of `hierarchical`, `circle`, `organic`, `compact-tree`, `radial-tree`, `partition`, `stack`
+  - `options` (object, optional): Algorithm-specific options
+    - For `hierarchical` only: `direction` ∈ `"top-down" | "left-right"` (default: `"top-down"`)
 - `nodes` (array, required): Array of node objects to add, each containing:
   - `id` (string, required): Unique identifier for the node
   - `title` (string, required): Display label (supports newlines with `\n`)
@@ -157,6 +161,24 @@ Add one or more nodes to an existing diagram in a single operation.
   ]
 }
 ```
+
+**Example (With Layout):**
+```json
+{
+  "file_path": "./diagrams/system-architecture.drawio.svg",
+  "layout": {
+    "algorithm": "hierarchical",
+    "options": { "direction": "left-right" }
+  },
+  "nodes": [
+    { "id": "api", "title": "API", "kind": "Rectangle", "x": 40, "y": 40 },
+    { "id": "service", "title": "Service", "kind": "Rectangle", "x": 200, "y": 40 },
+    { "id": "db", "title": "DB", "kind": "Cylinder", "x": 360, "y": 40 }
+  ]
+}
+```
+
+Note: The layout runs once after all insertions and considers existing edges in the diagram file. For best results when edges are created or modified later, a dedicated `layout_diagram` tool is recommended (to be added).
 
 ### link_nodes
 

@@ -1,9 +1,9 @@
-import { mxGraph, mxCodec, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxGeometry } from './mxgraph/index.js';
+import { mxGraph, mxCodec, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxGeometry, mxFastOrganicLayout, mxCompactTreeLayout, mxRadialTreeLayout, mxPartitionLayout, mxStackLayout } from './mxgraph/index.js';
 
 export class Graph {
   static Kinds = {
     Rectangle: { style: { rounded: 1, whiteSpace: 'wrap', html: 1 }, width: 120, height: 60 },
-    Elipse: { style: { ellipse: '', whiteSpace: 'wrap', html: 1 }, width: 120, height: 80 },
+    Ellipse: { style: { ellipse: '', whiteSpace: 'wrap', html: 1 }, width: 120, height: 80 },
     Cylinder: { style: 'shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;', width: 60, height: 80 },
     Cloud: { style: 'ellipse;shape=cloud;whiteSpace=wrap;html=1;', width: 120, height: 80 },
     Square: { style: 'whiteSpace=wrap;html=1;aspect=fixed;rounded=1;', width: 80, height: 80 },
@@ -11,6 +11,11 @@ export class Graph {
     Step: { style: 'shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;', width: 120, height: 80 },
     Actor: { style: 'shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;', width: 30, height: 60 },
     Text: { style: 'text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;', width: 60, height: 30 },
+  }
+
+  static normalizeKind(kind: string) {
+    if (kind === 'Elipse') return 'Ellipse';
+    return kind;
   }
 
   graph: typeof mxGraph;
@@ -37,7 +42,8 @@ export class Graph {
   }
 
   addNode({ id, title, parent = 'root', kind = 'Rectangle', x = 10, y = 10, ...rest }) {
-    const { style, width, height } = { ...Graph.Kinds[kind], ...rest }
+    const normalizedKind = Graph.normalizeKind(kind)
+    const { style, width, height } = { ...Graph.Kinds[normalizedKind], ...rest }
     const to = parent === 'root' ? this.root : this.model.getCell(parent)
     const node = this.graph.insertVertex(to, id, title, Number(x), Number(y), width, height);
     node.setStyle(style)
@@ -50,7 +56,7 @@ export class Graph {
     if (!node) throw new Error(`Node not found`);
 
     if (title) node.setValue(title);
-    if (kind) node.setStyle(Graph.Kinds[kind].style);
+    if (kind) node.setStyle(Graph.Kinds[Graph.normalizeKind(kind)].style);
     if (x !== undefined || y !== undefined || width !== undefined || height !== undefined) {
       const geometry = node.getGeometry();
       node.setGeometry(new mxGeometry(
@@ -95,6 +101,54 @@ export class Graph {
   circleLayout() {
     const layout = new mxCircleLayout(this.graph);
     layout.execute(this.root);
+    return this
+  }
+
+  applyLayout({ algorithm, options = {} }: { algorithm: string; options?: any }) {
+    const supportedAlgorithms = ['hierarchical','circle','organic','compact-tree','radial-tree','partition','stack']
+    switch (algorithm) {
+      case 'hierarchical': {
+        if (options.direction !== undefined && options.direction !== 'top-down' && options.direction !== 'left-right') {
+          throw new Error(`Invalid hierarchical direction: ${options.direction}. Allowed: top-down, left-right`);
+        }
+        const direction = options.direction === 'left-right' ? mxConstants.DIRECTION_WEST : mxConstants.DIRECTION_NORTH;
+        const layout = new mxHierarchicalLayout(this.graph, direction);
+        layout.execute(this.root);
+        break;
+      }
+      case 'circle': {
+        const layout = new mxCircleLayout(this.graph);
+        layout.execute(this.root);
+        break;
+      }
+      case 'organic': {
+        const layout = new mxFastOrganicLayout(this.graph);
+        layout.execute(this.root);
+        break;
+      }
+      case 'compact-tree': {
+        const layout = new mxCompactTreeLayout(this.graph);
+        layout.execute(this.root);
+        break;
+      }
+      case 'radial-tree': {
+        const layout = new mxRadialTreeLayout(this.graph);
+        layout.execute(this.root);
+        break;
+      }
+      case 'partition': {
+        const layout = new mxPartitionLayout(this.graph);
+        layout.execute(this.root);
+        break;
+      }
+      case 'stack': {
+        const layout = new mxStackLayout(this.graph);
+        layout.execute(this.root);
+        break;
+      }
+      default:
+        throw new Error(`Unsupported layout algorithm: ${algorithm}. Supported: ${supportedAlgorithms.join(', ')}`);
+    }
     return this
   }
 
