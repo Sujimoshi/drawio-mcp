@@ -1,5 +1,21 @@
 import { mxGraph, mxCodec, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxGeometry, mxFastOrganicLayout, mxCompactTreeLayout, mxRadialTreeLayout, mxPartitionLayout, mxStackLayout } from './mxgraph/index.js';
 
+const LAYOUT_HIERARCHICAL = 'hierarchical'
+const LAYOUT_CIRCLE = 'circle'
+const LAYOUT_ORGANIC = 'organic'
+const LAYOUT_COMPACT_TREE = 'compact-tree'
+const LAYOUT_RADIAL_TREE = 'radial-tree'
+const LAYOUT_PARTITION = 'partition'
+const LAYOUT_STACK = 'stack'
+
+const DIRECTION_TOP_DOWN = 'top-down'
+const DIRECTION_LEFT_RIGHT = 'left-right'
+
+const DIR_TO_MX_DIRECTION = {
+  [DIRECTION_TOP_DOWN]: mxConstants.DIRECTION_NORTH,
+  [DIRECTION_LEFT_RIGHT]: mxConstants.DIRECTION_WEST
+}
+
 export class Graph {
   static Kinds = {
     Rectangle: { style: { rounded: 1, whiteSpace: 'wrap', html: 1 }, width: 120, height: 60 },
@@ -91,65 +107,126 @@ export class Graph {
     return this
   }
 
-  hierarchicalLayout(direction = 'top-down') {
-    const dir = { 'top-down': mxConstants.DIRECTION_NORTH, 'left-right': mxConstants.DIRECTION_WEST }[direction]
-    const layout = new mxHierarchicalLayout(this.graph, dir);
-    layout.execute(this.root, Object.values(this.model.cells)[1]);
+  /**
+   * Executes a given layout algorithm on the graph's root element.
+   *
+   * @param layout - An object with an `execute` method, typically an mxGraph layout instance.
+   * @param args - Additional arguments to pass to the layout's `execute` method.
+   * @returns The current Graph instance for method chaining.
+   *
+   * @remarks
+   * This method is used internally to apply various mxGraph layout algorithms
+   * (e.g., hierarchical, circle, organic) to the graph. The layout is executed
+   * on the root element of the graph, and any additional arguments are forwarded
+   * to the layout's `execute` method.
+   */
+  private runLayout(layout: { execute: (...params: any[]) => void }, ...args: any[]) {
+    layout.execute(this.root, ...args);
     return this
+  }
+
+  hierarchicalLayout(direction = DIRECTION_TOP_DOWN) {
+    const dir = DIR_TO_MX_DIRECTION[direction]
+    const layout = new mxHierarchicalLayout(this.graph, dir);
+    return this.runLayout(layout, Object.values(this.model.cells)[1])
   }
 
   circleLayout() {
     const layout = new mxCircleLayout(this.graph);
-    layout.execute(this.root);
-    return this
+    return this.runLayout(layout)
   }
 
+  organicLayout() {
+    const layout = new mxFastOrganicLayout(this.graph);
+    return this.runLayout(layout)
+  }
+
+  compactTreeLayout() {
+    const layout = new mxCompactTreeLayout(this.graph);
+    return this.runLayout(layout)
+  }
+
+  radialTreeLayout() {
+    const layout = new mxRadialTreeLayout(this.graph);
+    return this.runLayout(layout)
+  }
+
+  partitionLayout() {
+    const layout = new mxPartitionLayout(this.graph);
+    return this.runLayout(layout)
+  }
+
+  stackLayout() {
+    const layout = new mxStackLayout(this.graph);
+    return this.runLayout(layout)
+  }
+
+  /**
+   * Applies a layout algorithm to the graph.
+   *
+   * @param params - An object containing the layout algorithm and optional options.
+   * @param params.algorithm - The name of the layout algorithm to apply. Supported values are:
+   *   - 'hierarchical'
+   *   - 'circle'
+   *   - 'organic'
+   *   - 'compact-tree'
+   *   - 'radial-tree'
+   *   - 'partition'
+   *   - 'stack'
+   * @param params.options - Optional parameters for the layout algorithm.
+   *   - For 'hierarchical', you may specify `direction` as either 'top-down' or 'left-right'.
+   *
+   * @throws {Error} If an unsupported algorithm is provided, or if an invalid direction is specified for hierarchical layout.
+   *
+   * @returns {Graph} The current Graph instance for method chaining.
+   *
+   * @example
+   * graph.applyLayout({ algorithm: 'hierarchical', options: { direction: 'left-right' } });
+   * graph.applyLayout({ algorithm: 'circle' });
+   */
   applyLayout({ algorithm, options = {} }: { algorithm: string; options?: any }) {
-    const supportedAlgorithms = ['hierarchical','circle','organic','compact-tree','radial-tree','partition','stack']
     switch (algorithm) {
-      case 'hierarchical': {
-        if (options.direction !== undefined && options.direction !== 'top-down' && options.direction !== 'left-right') {
-          throw new Error(`Invalid hierarchical direction: ${options.direction}. Allowed: top-down, left-right`);
-        }
-        const direction = options.direction === 'left-right' ? mxConstants.DIRECTION_WEST : mxConstants.DIRECTION_NORTH;
-        const layout = new mxHierarchicalLayout(this.graph, direction);
-        layout.execute(this.root);
+      case LAYOUT_HIERARCHICAL: {
+        if (  options.direction !== undefined &&
+              options.direction !== DIRECTION_TOP_DOWN && options.direction !== DIRECTION_LEFT_RIGHT )
+            throw new Error( `Invalid hierarchical direction: ${options.direction}. Allowed: ${DIRECTION_TOP_DOWN}, ${DIRECTION_LEFT_RIGHT}` );
+
+        this.hierarchicalLayout(options.direction);
         break;
       }
-      case 'circle': {
-        const layout = new mxCircleLayout(this.graph);
-        layout.execute(this.root);
+      case LAYOUT_CIRCLE: {
+        this.circleLayout();
         break;
       }
-      case 'organic': {
-        const layout = new mxFastOrganicLayout(this.graph);
-        layout.execute(this.root);
+      case LAYOUT_ORGANIC: {
+        this.organicLayout();
         break;
       }
-      case 'compact-tree': {
-        const layout = new mxCompactTreeLayout(this.graph);
-        layout.execute(this.root);
+      case LAYOUT_COMPACT_TREE: {
+        this.compactTreeLayout();
         break;
       }
-      case 'radial-tree': {
-        const layout = new mxRadialTreeLayout(this.graph);
-        layout.execute(this.root);
+      case LAYOUT_RADIAL_TREE: {
+        this.radialTreeLayout();
         break;
       }
-      case 'partition': {
-        const layout = new mxPartitionLayout(this.graph);
-        layout.execute(this.root);
+      case LAYOUT_PARTITION: {
+        this.partitionLayout();
         break;
       }
-      case 'stack': {
-        const layout = new mxStackLayout(this.graph);
-        layout.execute(this.root);
+      case LAYOUT_STACK: {
+        this.stackLayout();
         break;
       }
-      default:
-        throw new Error(`Unsupported layout algorithm: ${algorithm}. Supported: ${supportedAlgorithms.join(', ')}`);
+      default: {
+        const supportedAlgorithms = [ LAYOUT_HIERARCHICAL, LAYOUT_CIRCLE, LAYOUT_ORGANIC,
+                                      LAYOUT_COMPACT_TREE, LAYOUT_RADIAL_TREE, LAYOUT_PARTITION,
+                                      LAYOUT_STACK,
+                                    ];
+        throw new Error( `Unsupported layout algorithm: ${algorithm}. Supported: ${supportedAlgorithms.join(', ')}` );
+      }
     }
-    return this
+    return this;
   }
 
   toXML() {
