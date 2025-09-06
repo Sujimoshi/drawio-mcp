@@ -125,41 +125,6 @@ export class Graph {
     return this
   }
 
-  hierarchicalLayout(direction = DIRECTION_TOP_DOWN) {
-    const dir = DIR_TO_MX_DIRECTION[direction]
-    const layout = new mxHierarchicalLayout(this.graph, dir);
-    return this.runLayout(layout, Object.values(this.model.cells)[1])
-  }
-
-  circleLayout() {
-    const layout = new mxCircleLayout(this.graph);
-    return this.runLayout(layout)
-  }
-
-  organicLayout() {
-    const layout = new mxFastOrganicLayout(this.graph);
-    return this.runLayout(layout)
-  }
-
-  compactTreeLayout() {
-    const layout = new mxCompactTreeLayout(this.graph);
-    return this.runLayout(layout)
-  }
-
-  radialTreeLayout() {
-    const layout = new mxRadialTreeLayout(this.graph);
-    return this.runLayout(layout)
-  }
-
-  partitionLayout() {
-    const layout = new mxPartitionLayout(this.graph);
-    return this.runLayout(layout)
-  }
-
-  stackLayout() {
-    const layout = new mxStackLayout(this.graph);
-    return this.runLayout(layout)
-  }
 
   /**
    * Applies a layout algorithm to the graph.
@@ -191,31 +156,31 @@ export class Graph {
               options.direction !== DIRECTION_TOP_DOWN && options.direction !== DIRECTION_LEFT_RIGHT )
             throw new Error( `Invalid hierarchical direction: ${options.direction}. Allowed: ${DIRECTION_TOP_DOWN}, ${DIRECTION_LEFT_RIGHT}` );
 
-        this.hierarchicalLayout(options.direction);
+        this.runLayout(new mxHierarchicalLayout(this.graph, DIR_TO_MX_DIRECTION[options.direction]), Object.values(this.model.cells)[1]);
         break;
       }
       case LAYOUT_CIRCLE: {
-        this.circleLayout();
+        this.runLayout(new mxCircleLayout(this.graph));
         break;
       }
       case LAYOUT_ORGANIC: {
-        this.organicLayout();
+        this.runLayout(new mxFastOrganicLayout(this.graph));
         break;
       }
       case LAYOUT_COMPACT_TREE: {
-        this.compactTreeLayout();
+        this.runLayout(new mxCompactTreeLayout(this.graph));
         break;
       }
       case LAYOUT_RADIAL_TREE: {
-        this.radialTreeLayout();
+        this.runLayout(new mxRadialTreeLayout(this.graph));
         break;
       }
       case LAYOUT_PARTITION: {
-        this.partitionLayout();
+        this.runLayout(new mxPartitionLayout(this.graph));
         break;
       }
       case LAYOUT_STACK: {
-        this.stackLayout();
+        this.runLayout(new mxStackLayout(this.graph));
         break;
       }
       default: {
