@@ -1,9 +1,25 @@
-import { mxGraph, mxCodec, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxGeometry } from './mxgraph/index.js';
+import { mxGraph, mxCodec, mxUtils, mxHierarchicalLayout, mxConstants, mxCircleLayout, mxGeometry, mxFastOrganicLayout, mxCompactTreeLayout, mxRadialTreeLayout, mxPartitionLayout, mxStackLayout } from './mxgraph/index.js';
+
+const LAYOUT_HIERARCHICAL = 'hierarchical'
+const LAYOUT_CIRCLE = 'circle'
+const LAYOUT_ORGANIC = 'organic'
+const LAYOUT_COMPACT_TREE = 'compact-tree'
+const LAYOUT_RADIAL_TREE = 'radial-tree'
+const LAYOUT_PARTITION = 'partition'
+const LAYOUT_STACK = 'stack'
+
+const DIRECTION_TOP_DOWN = 'top-down'
+const DIRECTION_LEFT_RIGHT = 'left-right'
+
+const DIR_TO_MX_DIRECTION = {
+  [DIRECTION_TOP_DOWN]: mxConstants.DIRECTION_NORTH,
+  [DIRECTION_LEFT_RIGHT]: mxConstants.DIRECTION_WEST
+}
 
 export class Graph {
   static Kinds = {
     Rectangle: { style: { rounded: 1, whiteSpace: 'wrap', html: 1 }, width: 120, height: 60 },
-    Elipse: { style: { ellipse: '', whiteSpace: 'wrap', html: 1 }, width: 120, height: 80 },
+    Ellipse: { style: { ellipse: '', whiteSpace: 'wrap', html: 1 }, width: 120, height: 80 },
     Cylinder: { style: 'shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;', width: 60, height: 80 },
     Cloud: { style: 'ellipse;shape=cloud;whiteSpace=wrap;html=1;', width: 120, height: 80 },
     Square: { style: 'whiteSpace=wrap;html=1;aspect=fixed;rounded=1;', width: 80, height: 80 },
@@ -11,6 +27,11 @@ export class Graph {
     Step: { style: 'shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;', width: 120, height: 80 },
     Actor: { style: 'shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;', width: 30, height: 60 },
     Text: { style: 'text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;', width: 60, height: 30 },
+  }
+
+  static normalizeKind(kind: string) {
+    if (kind === 'Elipse') return 'Ellipse';
+    return kind;
   }
 
   graph: typeof mxGraph;
@@ -37,7 +58,8 @@ export class Graph {
   }
 
   addNode({ id, title, parent = 'root', kind = 'Rectangle', x = 10, y = 10, ...rest }) {
-    const { style, width, height } = { ...Graph.Kinds[kind], ...rest }
+    const normalizedKind = Graph.normalizeKind(kind)
+    const { style, width, height } = { ...Graph.Kinds[normalizedKind], ...rest }
     const to = parent === 'root' ? this.root : this.model.getCell(parent)
     const node = this.graph.insertVertex(to, id, title, Number(x), Number(y), width, height);
     node.setStyle(style)
@@ -50,7 +72,7 @@ export class Graph {
     if (!node) throw new Error(`Node not found`);
 
     if (title) node.setValue(title);
-    if (kind) node.setStyle(Graph.Kinds[kind].style);
+    if (kind) node.setStyle(Graph.Kinds[Graph.normalizeKind(kind)].style);
     if (x !== undefined || y !== undefined || width !== undefined || height !== undefined) {
       const geometry = node.getGeometry();
       node.setGeometry(new mxGeometry(
@@ -85,17 +107,91 @@ export class Graph {
     return this
   }
 
-  hierarchicalLayout(direction = 'top-down') {
-    const dir = { 'top-down': mxConstants.DIRECTION_NORTH, 'left-right': mxConstants.DIRECTION_WEST }[direction]
-    const layout = new mxHierarchicalLayout(this.graph, dir);
-    layout.execute(this.root, Object.values(this.model.cells)[1]);
+  /**
+   * Executes a given layout algorithm on the graph's root element.
+   *
+   * @param layout - An object with an `execute` method, typically an mxGraph layout instance.
+   * @param args - Additional arguments to pass to the layout's `execute` method.
+   * @returns The current Graph instance for method chaining.
+   *
+   * @remarks
+   * This method is used internally to apply various mxGraph layout algorithms
+   * (e.g., hierarchical, circle, organic) to the graph. The layout is executed
+   * on the root element of the graph, and any additional arguments are forwarded
+   * to the layout's `execute` method.
+   */
+  private runLayout(layout: { execute: (...params: any[]) => void }, ...args: any[]) {
+    layout.execute(this.root, ...args);
     return this
   }
 
-  circleLayout() {
-    const layout = new mxCircleLayout(this.graph);
-    layout.execute(this.root);
-    return this
+
+  /**
+   * Applies a layout algorithm to the graph.
+   *
+   * @param params - An object containing the layout algorithm and optional options.
+   * @param params.algorithm - The name of the layout algorithm to apply. Supported values are:
+   *   - 'hierarchical'
+   *   - 'circle'
+   *   - 'organic'
+   *   - 'compact-tree'
+   *   - 'radial-tree'
+   *   - 'partition'
+   *   - 'stack'
+   * @param params.options - Optional parameters for the layout algorithm.
+   *   - For 'hierarchical', you may specify `direction` as either 'top-down' or 'left-right'.
+   *
+   * @throws {Error} If an unsupported algorithm is provided, or if an invalid direction is specified for hierarchical layout.
+   *
+   * @returns {Graph} The current Graph instance for method chaining.
+   *
+   * @example
+   * graph.applyLayout({ algorithm: 'hierarchical', options: { direction: 'left-right' } });
+   * graph.applyLayout({ algorithm: 'circle' });
+   */
+  applyLayout({ algorithm, options = {} }: { algorithm: string; options?: any }) {
+    switch (algorithm) {
+      case LAYOUT_HIERARCHICAL: {
+        if (  options.direction !== undefined &&
+              options.direction !== DIRECTION_TOP_DOWN && options.direction !== DIRECTION_LEFT_RIGHT )
+            throw new Error( `Invalid hierarchical direction: ${options.direction}. Allowed: ${DIRECTION_TOP_DOWN}, ${DIRECTION_LEFT_RIGHT}` );
+
+        this.runLayout(new mxHierarchicalLayout(this.graph, DIR_TO_MX_DIRECTION[options.direction]), Object.values(this.model.cells)[1]);
+        break;
+      }
+      case LAYOUT_CIRCLE: {
+        this.runLayout(new mxCircleLayout(this.graph));
+        break;
+      }
+      case LAYOUT_ORGANIC: {
+        this.runLayout(new mxFastOrganicLayout(this.graph));
+        break;
+      }
+      case LAYOUT_COMPACT_TREE: {
+        this.runLayout(new mxCompactTreeLayout(this.graph));
+        break;
+      }
+      case LAYOUT_RADIAL_TREE: {
+        this.runLayout(new mxRadialTreeLayout(this.graph));
+        break;
+      }
+      case LAYOUT_PARTITION: {
+        this.runLayout(new mxPartitionLayout(this.graph));
+        break;
+      }
+      case LAYOUT_STACK: {
+        this.runLayout(new mxStackLayout(this.graph));
+        break;
+      }
+      default: {
+        const supportedAlgorithms = [ LAYOUT_HIERARCHICAL, LAYOUT_CIRCLE, LAYOUT_ORGANIC,
+                                      LAYOUT_COMPACT_TREE, LAYOUT_RADIAL_TREE, LAYOUT_PARTITION,
+                                      LAYOUT_STACK,
+                                    ];
+        throw new Error( `Unsupported layout algorithm: ${algorithm}. Supported: ${supportedAlgorithms.join(', ')}` );
+      }
+    }
+    return this;
   }
 
   toXML() {

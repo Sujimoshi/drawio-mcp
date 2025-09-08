@@ -11,7 +11,7 @@ import { RemoveNodesTool } from './mcp/RemoveNodesTool.js';
 
 new McpServer({
   name: 'drawio-mcp',
-  version: '1.0.0',
+  version: '1.1.0',
   tools: [
     new NewDiagramTool(),
     new AddNodeTool(),

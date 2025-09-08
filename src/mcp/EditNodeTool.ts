@@ -54,7 +54,7 @@ export class EditNodeTool implements Tool {
     for (const node of nodes) {
       const { id, title, kind, x, y, width, height } = node;
       
-      graph.editNode({ id, title, kind, x, y, width, height });
+      graph.editNode({ id, title, kind: kind ? Graph.normalizeKind(kind) : undefined, x, y, width, height });
     }
 
     await this.fileManager.saveGraphToSvg(graph, file_path);
