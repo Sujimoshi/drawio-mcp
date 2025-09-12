@@ -102,6 +102,7 @@ Add one or more nodes to an existing diagram in a single operation. Optionally r
   - `parent` (string, optional): Parent node ID (default: "root")
   - `width` (number, optional): Custom width
   - `height` (number, optional): Custom height
+  - `corner_radius` (integer, optional): Corner radius in pixels (≥ 1). Only applies to `RoundedRectangle`. Default is 12 when `kind` is `RoundedRectangle` and `corner_radius` is omitted. The effective visual radius is capped by draw.io/mxGraph to at most half of the shorter side of the node.
 
 **Available Node Types:**
 - `Rectangle`: Standard rectangular node
@@ -113,6 +114,7 @@ Add one or more nodes to an existing diagram in a single operation. Optionally r
 - `Step`: Process step shape
 - `Actor`: UML actor (stick figure)
 - `Text`: Text-only node
+- `RoundedRectangle`: Rectangle with rounded corners (supports `corner_radius` in pixels)
 
 **Example (Single Node):**
 ```json
@@ -248,6 +250,7 @@ Modify properties of one or more existing nodes or edges in a single operation.
   - `y` (number, optional): New Y coordinate (nodes only)
   - `width` (number, optional): New width (nodes only)
   - `height` (number, optional): New height (nodes only)
+  - `corner_radius` (integer, optional): Corner radius in pixels (≥ 1). Applies when the node is `RoundedRectangle`. If switching kind to `RoundedRectangle` and omitted, default 12 is applied. Ignored for other kinds.
 
 **Example (Single Node):**
 ```json
