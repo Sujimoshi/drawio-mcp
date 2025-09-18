@@ -48,7 +48,8 @@ export class AddNodeTool implements Tool {
                 x: { type: 'number', description: 'X coordinate' },
                 y: { type: 'number', description: 'Y coordinate' },
                 width: { type: 'number', description: 'Custom width (optional)' },
-                height: { type: 'number', description: 'Custom height (optional)' }
+                height: { type: 'number', description: 'Custom height (optional)' },
+                corner_radius: { type: 'integer', minimum: 1, description: 'Corner radius in pixels (≥1), only for kind RoundedRectangle' }
               },
               required: ['id', 'title', 'x', 'y', 'kind']
             }
@@ -67,7 +68,7 @@ export class AddNodeTool implements Tool {
     const graph = await this.fileManager.loadGraphFromSvg(file_path);
 
     for (const node of nodes) {
-      const { id, title, kind, parent, x, y, width, height } = node;
+      const { id, title, kind, parent, x, y, width, height, corner_radius } = node;
 
       graph.addNode({ 
         id, 
@@ -77,7 +78,8 @@ export class AddNodeTool implements Tool {
         x: Number(x), 
         y: Number(y),
         ...(width && { width: Number(width) }),
-        ...(height && { height: Number(height) })
+        ...(height && { height: Number(height) }),
+        ...(corner_radius && { corner_radius: Number(corner_radius) })
       });
     }
 

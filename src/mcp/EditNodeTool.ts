@@ -33,7 +33,8 @@ export class EditNodeTool implements Tool {
                 x: { type: 'number', description: 'New node X coordinate, only appliable to nodes (optional)' },
                 y: { type: 'number', description: 'New node Y coordinate, only appliable to nodes (optional)' },
                 width: { type: 'number', description: 'New node width, only appliable to nodes (optional)' },
-                height: { type: 'number', description: 'New node height, only appliable to nodes (optional)' }
+                height: { type: 'number', description: 'New node height, only appliable to nodes (optional)' },
+                corner_radius: { type: 'integer', minimum: 1, description: 'Corner radius in pixels (≥1), applies to RoundedRectangle' }
               },
               required: ['id']
             }
@@ -52,9 +53,9 @@ export class EditNodeTool implements Tool {
     const graph = await this.fileManager.loadGraphFromSvg(file_path);
 
     for (const node of nodes) {
-      const { id, title, kind, x, y, width, height } = node;
+      const { id, title, kind, x, y, width, height, corner_radius } = node;
       
-      graph.editNode({ id, title, kind: kind ? Graph.normalizeKind(kind) : undefined, x, y, width, height });
+      graph.editNode({ id, title, kind: kind ? Graph.normalizeKind(kind) : undefined, x, y, width, height, ...(corner_radius && { corner_radius: Number(corner_radius) }) });
     }
 
     await this.fileManager.saveGraphToSvg(graph, file_path);
