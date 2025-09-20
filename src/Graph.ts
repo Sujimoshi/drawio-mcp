@@ -21,6 +21,15 @@ const KIND_ROUNDED_RECTANGLE = 'RoundedRectangle'
 const PROP_ARC_SIZE = 'arcSize'
 const PROP_ABSOLUTE_ARC_SIZE = 'absoluteArcSize'
 
+
+export type LinkNodesParams = {
+  from: string;
+  to: string;
+  title?: string;
+  style?: Record<string, any>;
+  undirected?: boolean;
+}
+
 export class Graph {
   static Kinds = {
     Rectangle: { style: { rounded: 1, whiteSpace: 'wrap', html: 1 }, width: 120, height: 60 },
@@ -188,19 +197,31 @@ export class Graph {
     return this
   }
 
-  linkNodes({ from, to, title, style = {} }) {
-    const [fromNode, toNode] = [this.model.getCell(from), this.model.getCell(to)]
-    const id = `${from}-2-${to}`
-    const line = this.graph.insertEdge(this.root, id, title ? title : null, fromNode, toNode);
-    line.setStyle(this.toStyleString({
-      edgeStyle: 'none',
-      noEdgeStyle: 1,
-      orthogonal: 1,
-      html: 1,
-      ...style
-    }))
+  linkNodes({ from, to, title, style = {}, undirected }: LinkNodesParams) {
     
-    return id
+    const [fromNode, toNode] = [this.model.getCell(from), this.model.getCell(to)]
+
+    // Compute candidate IDs
+    const idDirect = `${from}-2-${to}`
+    const idReverse = `${to}-2-${from}`
+    const [a, b] = [from, to].sort()
+    const idCanonical = `${a}-2-${b}`
+
+    // Build effective style
+    const effective: any = computeEffectiveLineStyle(style, undirected)
+
+     // Try to find an existing edge to update (do not rename IDs)
+    const existing = this.model.getCell(idDirect) || this.model.getCell(idReverse) || this.model.getCell(idCanonical)
+    let link = existing
+    if (link) {
+      if (title !== undefined) link.setValue(title)
+    } else { // Insert new edge; use canonical id for undirected, else direct id
+      const idToUse = undirected ? idCanonical : idDirect
+      link = this.graph.insertEdge(this.root, idToUse, title ? title : null, fromNode, toNode);
+    }
+    
+    link.setStyle(this.toStyleString(effective))
+    return link.getId()
   }
 
   removeNodes(ids: string[]) {
@@ -322,3 +343,21 @@ export class Graph {
   }
 }
 
+/**
+ * Computes the effective line style for an edge in the graph, merging the provided style
+ * with default base styles. If the edge is undirected, disables arrowheads and reverses.
+ *
+ * @param {Record<string, any>} style - Optional style overrides for the edge.
+ * @param {boolean} [undirected] - If true, creates an undirected edge (no arrows).
+ * @returns {Record<string, any>} The computed style object for the edge.
+ */
+function computeEffectiveLineStyle(style: Record<string, any> = {}, undirected?: boolean): Record<string, any> {
+  const base = { edgeStyle: 'none', noEdgeStyle: 1, orthogonal: 1, html: 1 }
+  const effective: Record<string, any> = { ...base, ...style }
+  if (undirected) {
+    effective.reverse = undefined
+    effective.startArrow = 'none'
+    effective.endArrow = 'none'
+  }
+  return effective
+}
