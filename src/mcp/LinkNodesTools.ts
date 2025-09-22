@@ -26,7 +26,8 @@ export class LinkNodesTool implements Tool {
                 to: { type: 'string', description: 'Target node ID' },
                 title: { type: 'string', description: 'Connection label (optional)' },
                 dashed: { type: 'boolean', description: 'Whether the connection should be dashed' },
-                reverse: { type: 'boolean', description: 'Whether to reverse the connection direction' }
+                reverse: { type: 'boolean', description: 'Whether to reverse the connection direction' },
+                undirected: { type: 'boolean', description: 'Create an undirected edge (no arrows); overrides reverse' }
               },
               required: ['from', 'to']
             }
@@ -45,14 +46,14 @@ export class LinkNodesTool implements Tool {
     const graph = await this.fileManager.loadGraphFromSvg(file_path);
 
     for (const edge of edges) {
-      const { from, to, title, dashed, reverse } = edge;
+      const { from, to, title, dashed, reverse, undirected } = edge;
 
       const style = {
         ...(dashed && { dashed: 1 }),
         ...(reverse && { reverse: true }),
       };
       
-      graph.linkNodes({ from, to, title, style });
+      graph.linkNodes({ from, to, title, style, undirected });
     }
 
     await this.fileManager.saveGraphToSvg(graph, file_path);

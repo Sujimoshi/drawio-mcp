@@ -194,6 +194,7 @@ Create one or more connections between existing nodes in a single operation.
   - `title` (string, optional): Connection label
   - `dashed` (boolean, optional): Whether to use dashed line style
   - `reverse` (boolean, optional): Whether to reverse arrow direction
+  - `undirected` (boolean, optional): Create an undirected edge (no arrows). Overrides `reverse`.
 
 **Example (Single Connection):**
 ```json
@@ -235,6 +236,26 @@ Create one or more connections between existing nodes in a single operation.
   ]
 }
 ```
+
+**Example (Undirected Connection):**
+```json
+{
+  "file_path": "./diagrams/system-architecture.drawio.svg",
+  "edges": [
+    {
+      "from": "service-a",
+      "to": "service-b",
+      "title": "peering",
+      "undirected": true
+    }
+  ]
+}
+```
+
+Notes on undirected behavior:
+- When `undirected` is true, the edge is rendered without arrowheads (no arrow at either end). The `reverse` parameter is ignored; `dashed` is still respected.
+- Undirected edges use a canonical ID format of `${min(from,to)}-2-${max(from,to)}` when a new edge is created.
+- If an edge between the two nodes already exists (in either direction or with the canonical ID), calling `link_nodes` again will update that existing edge’s label and style rather than creating a duplicate. The existing edge ID is preserved (no renaming).
 
 ### edit_nodes
 
