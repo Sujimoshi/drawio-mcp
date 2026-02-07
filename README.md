@@ -25,7 +25,7 @@ This server enables you to build diagrams incrementally by providing stateless t
 
 ### Prerequisites
 
-- Node.js 18.0.0 or higher
+- **Node.js 18.x, 20.x, 22.x, or 24.x**. Node 24 made `global.navigator` read-only; this project works around that so all supported versions work.
 - npm or yarn
 
 ## Configuration
