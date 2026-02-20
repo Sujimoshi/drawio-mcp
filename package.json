@@ -14,7 +14,8 @@
   ],
   "scripts": {
     "start": "tsx src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "tsc"
   },
   "keywords": [
     "mcp",

@@ -34,7 +34,15 @@ export class EditNodeTool implements Tool {
                 y: { type: 'number', description: 'New node Y coordinate, only appliable to nodes (optional)' },
                 width: { type: 'number', description: 'New node width, only appliable to nodes (optional)' },
                 height: { type: 'number', description: 'New node height, only appliable to nodes (optional)' },
-                corner_radius: { type: 'integer', minimum: 1, description: 'Corner radius in pixels (≥1), applies to RoundedRectangle' }
+                corner_radius: { type: 'integer', minimum: 1, description: 'Corner radius in pixels (≥1), applies to RoundedRectangle' },
+                fillColor: { type: 'string', description: 'Background fill color (hex, e.g., "#dae8fc")' },
+                strokeColor: { type: 'string', description: 'Border color (hex, e.g., "#6c8ebf")' },
+                fontColor: { type: 'string', description: 'Text color (hex, e.g., "#333333")' },
+                strokeWidth: { type: 'number', description: 'Border width in pixels' },
+                fontSize: { type: 'number', description: 'Font size in pixels' },
+                fontStyle: { type: 'integer', description: 'Font style bitmask: 1=bold, 2=italic, 4=underline (combinable, e.g., 3=bold+italic)' },
+                fontFamily: { type: 'string', description: 'Font family name (e.g., "Helvetica")' },
+                opacity: { type: 'number', minimum: 0, maximum: 100, description: 'Overall opacity (0=transparent, 100=opaque)' }
               },
               required: ['id']
             }
@@ -53,9 +61,9 @@ export class EditNodeTool implements Tool {
     const graph = await this.fileManager.loadGraphFromSvg(file_path);
 
     for (const node of nodes) {
-      const { id, title, kind, x, y, width, height, corner_radius } = node;
+      const { id, title, kind, x, y, width, height, corner_radius, fillColor, strokeColor, fontColor, strokeWidth, fontSize, fontStyle, fontFamily, opacity } = node;
       
-      graph.editNode({ id, title, kind: kind ? Graph.normalizeKind(kind) : undefined, x, y, width, height, ...(corner_radius && { corner_radius: Number(corner_radius) }) });
+      graph.editNode({ id, title, kind: kind ? Graph.normalizeKind(kind) : undefined, x, y, width, height, ...(corner_radius && { corner_radius: Number(corner_radius) }), fillColor, strokeColor, fontColor, strokeWidth, fontSize, fontStyle, fontFamily, opacity });
     }
 
     await this.fileManager.saveGraphToSvg(graph, file_path);

@@ -49,7 +49,15 @@ export class AddNodeTool implements Tool {
                 y: { type: 'number', description: 'Y coordinate' },
                 width: { type: 'number', description: 'Custom width (optional)' },
                 height: { type: 'number', description: 'Custom height (optional)' },
-                corner_radius: { type: 'integer', minimum: 1, description: 'Corner radius in pixels (≥1), only for kind RoundedRectangle' }
+                corner_radius: { type: 'integer', minimum: 1, description: 'Corner radius in pixels (≥1), only for kind RoundedRectangle' },
+                fillColor: { type: 'string', description: 'Background fill color (hex, e.g., "#dae8fc")' },
+                strokeColor: { type: 'string', description: 'Border color (hex, e.g., "#6c8ebf")' },
+                fontColor: { type: 'string', description: 'Text color (hex, e.g., "#333333")' },
+                strokeWidth: { type: 'number', description: 'Border width in pixels' },
+                fontSize: { type: 'number', description: 'Font size in pixels' },
+                fontStyle: { type: 'integer', description: 'Font style bitmask: 1=bold, 2=italic, 4=underline (combinable, e.g., 3=bold+italic)' },
+                fontFamily: { type: 'string', description: 'Font family name (e.g., "Helvetica")' },
+                opacity: { type: 'number', minimum: 0, maximum: 100, description: 'Overall opacity (0=transparent, 100=opaque)' }
               },
               required: ['id', 'title', 'x', 'y', 'kind']
             }
@@ -68,7 +76,7 @@ export class AddNodeTool implements Tool {
     const graph = await this.fileManager.loadGraphFromSvg(file_path);
 
     for (const node of nodes) {
-      const { id, title, kind, parent, x, y, width, height, corner_radius } = node;
+      const { id, title, kind, parent, x, y, width, height, corner_radius, fillColor, strokeColor, fontColor, strokeWidth, fontSize, fontStyle, fontFamily, opacity } = node;
 
       graph.addNode({ 
         id, 
@@ -79,7 +87,15 @@ export class AddNodeTool implements Tool {
         y: Number(y),
         ...(width && { width: Number(width) }),
         ...(height && { height: Number(height) }),
-        ...(corner_radius && { corner_radius: Number(corner_radius) })
+        ...(corner_radius && { corner_radius: Number(corner_radius) }),
+        ...(fillColor !== undefined && { fillColor }),
+        ...(strokeColor !== undefined && { strokeColor }),
+        ...(fontColor !== undefined && { fontColor }),
+        ...(strokeWidth !== undefined && { strokeWidth }),
+        ...(fontSize !== undefined && { fontSize }),
+        ...(fontStyle !== undefined && { fontStyle }),
+        ...(fontFamily !== undefined && { fontFamily }),
+        ...(opacity !== undefined && { opacity }),
       });
     }
 

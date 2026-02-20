@@ -1,5 +1,9 @@
-import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
-import { GraphFileManager } from "../GraphFileManager.js";
+import {
+  ErrorCode,
+  McpError,
+} from '@modelcontextprotocol/sdk/types.js';
+
+import { GraphFileManager } from '../GraphFileManager.js';
 import { Tool } from './McpServer.js';
 
 export class LinkNodesTool implements Tool {
@@ -27,7 +31,31 @@ export class LinkNodesTool implements Tool {
                 title: { type: 'string', description: 'Connection label (optional)' },
                 dashed: { type: 'boolean', description: 'Whether the connection should be dashed' },
                 reverse: { type: 'boolean', description: 'Whether to reverse the connection direction' },
-                undirected: { type: 'boolean', description: 'Create an undirected edge (no arrows); overrides reverse' }
+                undirected: { type: 'boolean', description: 'Create an undirected edge (no arrows); overrides reverse' },
+                edgeStyle: {
+                  type: 'string',
+                  enum: ['orthogonal', 'elbow', 'entity-relation', 'segment', 'straight'],
+                  description: 'Edge routing style: "orthogonal" (right-angle segments, best for routing around objects), "elbow" (single bend), "entity-relation" (ER diagram style), "segment" (fixed segments with waypoints), "straight" (direct line, default)'
+                },
+                waypoints: {
+                  type: 'array',
+                  description: 'Intermediate routing points the edge must pass through, in order from source to target. Useful for routing lines around other nodes.',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      x: { type: 'number', description: 'X coordinate of the waypoint' },
+                      y: { type: 'number', description: 'Y coordinate of the waypoint' }
+                    },
+                    required: ['x', 'y']
+                  }
+                },
+                strokeColor: { type: 'string', description: 'Line color (hex, e.g., "#6c8ebf")' },
+                fontColor: { type: 'string', description: 'Label text color (hex, e.g., "#333333")' },
+                strokeWidth: { type: 'number', description: 'Line width in pixels' },
+                fontSize: { type: 'number', description: 'Label font size in pixels' },
+                fontStyle: { type: 'integer', description: 'Font style bitmask: 1=bold, 2=italic, 4=underline (combinable, e.g., 3=bold+italic)' },
+                fontFamily: { type: 'string', description: 'Label font family name (e.g., "Helvetica")' },
+                opacity: { type: 'number', minimum: 0, maximum: 100, description: 'Overall opacity (0=transparent, 100=opaque)' }
               },
               required: ['from', 'to']
             }
@@ -46,18 +74,25 @@ export class LinkNodesTool implements Tool {
     const graph = await this.fileManager.loadGraphFromSvg(file_path);
 
     for (const edge of edges) {
-      const { from, to, title, dashed, reverse, undirected } = edge;
+      const { from, to, title, dashed, reverse, undirected, edgeStyle, waypoints, strokeColor, fontColor, strokeWidth, fontSize, fontStyle, fontFamily, opacity } = edge;
 
       const style = {
         ...(dashed && { dashed: 1 }),
         ...(reverse && { reverse: true }),
+        ...(strokeColor !== undefined && { strokeColor }),
+        ...(fontColor !== undefined && { fontColor }),
+        ...(strokeWidth !== undefined && { strokeWidth }),
+        ...(fontSize !== undefined && { fontSize }),
+        ...(fontStyle !== undefined && { fontStyle }),
+        ...(fontFamily !== undefined && { fontFamily }),
+        ...(opacity !== undefined && { opacity }),
       };
-      
-      graph.linkNodes({ from, to, title, style, undirected });
+
+      graph.linkNodes({ from, to, title, style, undirected, waypoints, edgeStyle });
     }
 
     await this.fileManager.saveGraphToSvg(graph, file_path);
-    
+
     return {
       content: [
         {

@@ -103,6 +103,14 @@ Add one or more nodes to an existing diagram in a single operation. Optionally r
   - `width` (number, optional): Custom width
   - `height` (number, optional): Custom height
   - `corner_radius` (integer, optional): Corner radius in pixels (≥ 1). Only applies to `RoundedRectangle`. Default is 12 when `kind` is `RoundedRectangle` and `corner_radius` is omitted. The effective visual radius is capped by draw.io/mxGraph to at most half of the shorter side of the node.
+  - `fillColor` (string, optional): Background fill color (hex, e.g., `#dae8fc`)
+  - `strokeColor` (string, optional): Border color (hex, e.g., `#6c8ebf`)
+  - `fontColor` (string, optional): Text color (hex, e.g., `#333333`)
+  - `strokeWidth` (number, optional): Border width in pixels
+  - `fontSize` (number, optional): Font size in pixels
+  - `fontStyle` (integer, optional): Font style bitmask: 1=bold, 2=italic, 4=underline (combinable, e.g., 3=bold+italic)
+  - `fontFamily` (string, optional): Font family name (e.g., `Helvetica`)
+  - `opacity` (number, optional): Overall opacity (0=transparent, 100=opaque)
 
 **Available Node Types:**
 - `Rectangle`: Standard rectangular node
@@ -182,6 +190,36 @@ Add one or more nodes to an existing diagram in a single operation. Optionally r
 
 Note: The layout runs once after all insertions and considers existing edges in the diagram file. For best results when edges are created or modified later, a dedicated `layout_diagram` tool is recommended (to be added).
 
+**Example (With Styling):**
+```json
+{
+  "file_path": "./diagrams/styled.drawio.svg",
+  "nodes": [
+    {
+      "id": "web-app",
+      "title": "Web App",
+      "kind": "RoundedRectangle",
+      "x": 100,
+      "y": 50,
+      "fillColor": "#dae8fc",
+      "strokeColor": "#6c8ebf",
+      "fontStyle": 1,
+      "fontSize": 14
+    },
+    {
+      "id": "database",
+      "title": "Database",
+      "kind": "Cylinder",
+      "x": 300,
+      "y": 50,
+      "fillColor": "#d5e8d4",
+      "strokeColor": "#82b366",
+      "opacity": 80
+    }
+  ]
+}
+```
+
 ### link_nodes
 
 Create one or more connections between existing nodes in a single operation.
@@ -195,6 +233,13 @@ Create one or more connections between existing nodes in a single operation.
   - `dashed` (boolean, optional): Whether to use dashed line style
   - `reverse` (boolean, optional): Whether to reverse arrow direction
   - `undirected` (boolean, optional): Create an undirected edge (no arrows). Overrides `reverse`.
+  - `strokeColor` (string, optional): Line color (hex, e.g., `#6c8ebf`)
+  - `fontColor` (string, optional): Label text color (hex, e.g., `#333333`)
+  - `strokeWidth` (number, optional): Line width in pixels
+  - `fontSize` (number, optional): Label font size in pixels
+  - `fontStyle` (integer, optional): Font style bitmask: 1=bold, 2=italic, 4=underline (combinable)
+  - `fontFamily` (string, optional): Label font family name (e.g., `Helvetica`)
+  - `opacity` (number, optional): Overall opacity (0=transparent, 100=opaque)
 
 **Example (Single Connection):**
 ```json
@@ -272,6 +317,14 @@ Modify properties of one or more existing nodes or edges in a single operation.
   - `width` (number, optional): New width (nodes only)
   - `height` (number, optional): New height (nodes only)
   - `corner_radius` (integer, optional): Corner radius in pixels (≥ 1). Applies when the node is `RoundedRectangle`. If switching kind to `RoundedRectangle` and omitted, default 12 is applied. Ignored for other kinds.
+  - `fillColor` (string, optional): Background fill color (hex, e.g., `#dae8fc`)
+  - `strokeColor` (string, optional): Border/line color (hex, e.g., `#6c8ebf`)
+  - `fontColor` (string, optional): Text color (hex, e.g., `#333333`)
+  - `strokeWidth` (number, optional): Border/line width in pixels
+  - `fontSize` (number, optional): Font size in pixels
+  - `fontStyle` (integer, optional): Font style bitmask: 1=bold, 2=italic, 4=underline (combinable)
+  - `fontFamily` (string, optional): Font family name (e.g., `Helvetica`)
+  - `opacity` (number, optional): Overall opacity (0=transparent, 100=opaque)
 
 **Example (Single Node):**
 ```json
